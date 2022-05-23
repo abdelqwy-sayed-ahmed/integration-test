@@ -1,12 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const Joi=require('joi')
+const auth = require('../middleware/auth')
 //load objectId middleware
 const validateObjectId=require('../middleware/vaidateObjectId')
 //load Schema
-const mongoose = require('mongoose')
-require('../models/Product')
-const Product=mongoose.model('products')
+
+const Product=require('../models/Product')
+
 
 //get-all-products
 
@@ -23,7 +24,7 @@ router.get('/:_id', validateObjectId,async(req, res) => {
 })
 
 //post-product
-router.post('/', async (req, res) => {
+router.post('/',auth,async (req, res) => {
   //check validate errors
   const { error } = validateProduct(req.body)
   if(error)return res.status(400).send(error.details[0].message)

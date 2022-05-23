@@ -1,3 +1,4 @@
 {
-  "db":"mongodb://localhost/integration"
+  "db":"mongodb://localhost/integration",
+  "jwtPrivateKey":"custom_jwtPrivateKey"
 }

@@ -1,5 +1,6 @@
 const request = require('supertest')
 const Product=require('../../models/Product')
+const User=require('../../models/User')
 
 let server;
 
@@ -46,10 +47,20 @@ describe('/products', () => {
   })
 
   describe('Post', () => {
-    it('should return 404 if invalid inputs', async() => {
-
+    const token = new User().generateAuthToken()
+    
+    it('should return 401 if user not logged in', async () => {
       const res = await request(server)
         .post('/products')
+        .send({ title: 'prod1' })
+        expect(res.status).toBe(401)
+    })
+
+    it('should return 400 if invalid inputs', async() => {
+      
+      const res = await request(server)
+        .post('/products')
+        .set('x-auth-token',token)
         .send({title:''})
         .send({title:'12'})
         .send({title:123})
@@ -57,15 +68,20 @@ describe('/products', () => {
     })
 
     it('should save the product if it is valid', async () => {
-      const res = await request(server)
-        .post('/products')
-        .send({ title: 'prod1' })
+      
+       await request(server)
+         .post('/products')
+         .set('x-auth-token',token)
+         .send({ title: 'prod1' })
       const product = await Product.findOne({ title: 'prod1' })
       expect(product).toHaveProperty('title','prod1')
     })
+
     it('should return the product if it is valid', async () => {
+      
       const res = await request(server)
         .post('/products')
+        .set('x-auth-token',token)
         .send({ title: 'prod1' })
       
       expect(res.body).toHaveProperty('title','prod1')
